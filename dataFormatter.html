@@ -29,6 +29,16 @@
         border-radius: 4px;
       }
 
+      .button {
+        background-color: #4f4f4f;
+        color: #e0e0e0;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+      }
+
       button {
         background-color: #4f4f4f;
         color: #e0e0e0;
@@ -63,6 +73,13 @@
         right: 14px;
         bottom: 20px;
         border-radius: 4px;
+      }
+
+      footer {
+        position: absolute;
+        bottom: 0;
+        text-decoration: none;
+        padding: 20px 10px;
       }
     </style>
     <script>
@@ -112,7 +129,10 @@
     </script>
   </head>
   <body>
-    <h1>Emoji Data Formatter 😎</h1>
+    <h1>
+      <a title="home" class="button" href="./index.html">⬅️</a> Data Formatter
+      😎
+    </h1>
     <textarea id="inputData" placeholder="Enter the data here"></textarea>
     <br />
     <button onclick="formatData()">Format Data ✨</button>
@@ -123,5 +143,11 @@
         Copy to Clipboard 📋
       </button>
     </div>
+    <footer>
+      Created by
+      <a class="button" target="_blank" href="https://twitter.com/AlexLeybourne"
+        >Alex Leybourne 😎</a
+      >
+    </footer>
   </body>
 </html>

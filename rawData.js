@@ -1,3 +1,4 @@
+export const rawData = `
 😀	GRINNING FACE	&#x1F600;   &#128512;	
 😁	GRINNING FACE WITH SMILING EYES	&#x1F601;	&#128513;	
 😂	FACE WITH TEARS OF JOY	&#x1F602;	&#128514;	
@@ -1789,3 +1790,4 @@
 🇿🇦	South Africa	&#x1F1FF; &#x1F1E6;	&#127487; &#127462;	
 🇿🇲	Zambia	&#x1F1FF; &#x1F1F2;	&#127487; &#127474;	
 🇿🇼	Zimbabwe	&#x1F1FF; &#x1F1FC;	&#127487; &#127484;
+`;
