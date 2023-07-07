@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Emoji Data Formatter 😎</title>
+    <style>
+      body {
+        background-color: #1f1f1f;
+        color: #e0e0e0;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        justify-content: center;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      textarea {
+        height: 200px;
+        background-color: #2f2f2f;
+        color: #e0e0e0;
+        border: none;
+        padding: 10px;
+        resize: none;
+        border-radius: 4px;
+      }
+
+      button {
+        background-color: #4f4f4f;
+        color: #e0e0e0;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      button:hover {
+        background-color: #707070;
+      }
+
+      .output-container {
+        overflow: hidden;
+        margin-top: 20px;
+        position: relative;
+      }
+
+      #outputData {
+        width: 100%;
+        height: 200px;
+        background-color: #2f2f2f;
+        color: #e0e0e0;
+        border: none;
+        padding: 10px;
+        resize: none;
+      }
+
+      .copy-button {
+        position: absolute;
+        right: 14px;
+        bottom: 20px;
+        border-radius: 4px;
+      }
+    </style>
+    <script>
+      function formatData() {
+        const inputData = document.getElementById('inputData').value;
+
+        // Split the data into lines
+        const lines = inputData.split('\n');
+
+        // Initialize an empty array to store the formatted objects
+        const formattedData = [];
+
+        // Regular expressions to extract emoji, name, hexadecimal, and decimal values
+        const regex = /(.+)\t(.+)\t(.+)\t(.+)/;
+
+        // Process each line of the data
+        for (const line of lines) {
+          // Extract the relevant information using regular expressions
+          const match = line.match(regex);
+
+          if (match) {
+            // Create an object with the extracted information
+            const emojiObject = {
+              Emoji: match[1],
+              Name: match[2],
+              Hexadecimal: match[3],
+              Decimal: match[4],
+            };
+
+            // Add the object to the formatted data array
+            formattedData.push(emojiObject);
+          }
+        }
+
+        // Convert the formatted data to a JSON string
+        const outputData = JSON.stringify(formattedData, null, 2);
+
+        // Update the output box with the formatted data
+        document.getElementById('outputData').value = outputData;
+      }
+
+      function copyToClipboard() {
+        const outputData = document.getElementById('outputData');
+        outputData.select();
+        document.execCommand('copy');
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Emoji Data Formatter 😎</h1>
+    <textarea id="inputData" placeholder="Enter the data here"></textarea>
+    <br />
+    <button onclick="formatData()">Format Data ✨</button>
+    <br />
+    <div class="output-container">
+      <textarea id="outputData" readonly></textarea>
+      <button class="copy-button" onclick="copyToClipboard()">
+        Copy to Clipboard 📋
+      </button>
+    </div>
+  </body>
+</html>
