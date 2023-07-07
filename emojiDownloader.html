@@ -49,8 +49,16 @@
       <h1>Emoji Viewer</h1>
 
       <div class="input-container">
-        <input type="text" id="textInput" placeholder="Type something..." />
+        <textarea
+          type="text"
+          id="textInput"
+          placeholder="Type something..."
+        ></textarea>
+        <button id="loadEmojisButton">Load All Emojis</button>
+        <button id="clearButton">Clear</button>
       </div>
+
+      <div id="characterContainer"></div>
 
       <div>
         <label for="imageSizeInput">Image Size (px):</label>
@@ -63,66 +71,182 @@
         />
       </div>
 
-      <div id="characterContainer"></div>
+      <div>
+        <p>File Name:</p>
+        <input
+          type="radio"
+          id="formatNameSizePx"
+          name="nameFormat"
+          value="name-size-px"
+        />
+        <label for="formatNameSizePx">Name-size-px</label>
+        <input type="radio" id="formatName" name="nameFormat" value="name" />
+        <label for="formatName">Name</label>
+        <input
+          type="radio"
+          id="formatHexadecimal"
+          name="nameFormat"
+          value="hexadecimal"
+          checked
+        />
+        <label for="formatHexadecimal">Hexadecimal</label>
+        <input
+          type="radio"
+          id="formatDecimal"
+          name="nameFormat"
+          value="decimal"
+        />
+        <label for="formatDecimal">Decimal</label>
+      </div>
 
-      <button id="downloadButton">Download Images</button>
+      <button id="downloadButton">No Emojis</button>
     </div>
 
-    <script>
-      //   import { formattedData } from './formattedData.js';
-      document
-        .getElementById('textInput')
-        .addEventListener('input', function () {
-          var text = this.value;
-          var characterContainer =
-            document.getElementById('characterContainer');
+    <script type="module">
+      import { formattedData } from './formattedData.js';
 
-          characterContainer.innerHTML = '';
+      const textInput = document.getElementById('textInput');
+      const loadEmojisButton = document.getElementById('loadEmojisButton');
+      const clearButton = document.getElementById('clearButton');
+      const characterContainer = document.getElementById('characterContainer');
+      const downloadButton = document.getElementById('downloadButton');
+      const imageSizeInput = document.getElementById('imageSizeInput');
+      const nameFormatRadios = document.querySelectorAll(
+        'input[name="nameFormat"]'
+      );
 
-          var words = text.split(' ');
+      let count = 0;
 
-          words.forEach(function (word) {
-            if (word.trim() !== '') {
-              var divElement = document.createElement('div');
-              divElement.classList.add('character-container');
-              divElement.textContent = word;
-              characterContainer.appendChild(divElement);
-            }
-          });
+      const updateCharacterContainer = () => {
+        characterContainer.innerHTML = '';
+
+        const words = textInput.value.split(' ');
+
+        count = 0;
+
+        words.forEach((word) => {
+          if (word.trim() !== '') {
+            count++;
+            const divElement = document.createElement('div');
+            divElement.classList.add('character-container');
+            divElement.textContent = word;
+            characterContainer.appendChild(divElement);
+          }
         });
 
-      document
-        .getElementById('downloadButton')
-        .addEventListener('click', function () {
-          var characterContainers = document.querySelectorAll(
-            '.character-container'
+        if (count === 0 || undefined) {
+          downloadButton.textContent = 'No Emojis';
+        } else if (count === 1) {
+          downloadButton.textContent = 'Download Image';
+        } else {
+          downloadButton.textContent = `Download ${count} Images`;
+        }
+      };
+
+      clearButton.addEventListener('click', () => {
+        textInput.value = '';
+        updateCharacterContainer();
+      });
+
+      textInput.addEventListener('input', () => {
+        updateCharacterContainer();
+      });
+
+      downloadButton.addEventListener('click', () => {
+        const characterContainers = document.querySelectorAll(
+          '.character-container'
+        );
+        const imageSize = imageSizeInput.value;
+        const selectedFormat = document.querySelector(
+          'input[name="nameFormat"]:checked'
+        ).value;
+        const numImages = characterContainers.length;
+
+        const zip = new JSZip();
+
+        characterContainers.forEach((characterContainer, index) => {
+          const emojiCharacter = characterContainer.textContent;
+
+          const parser = new DOMParser();
+          const emojiElement = parser.parseFromString(
+            emojiCharacter,
+            'text/html'
           );
-          var imageSizeInput = document.getElementById('imageSizeInput');
-          var imageSize = imageSizeInput.value;
+          const encodedEmoji = emojiElement.documentElement.textContent;
 
-          characterContainers.forEach(function (characterContainer, index) {
-            var canvas = document.createElement('canvas');
-            var context = canvas.getContext('2d');
+          const baseEmoji = encodedEmoji.replace(/\uFE0F/g, '');
 
-            canvas.width = imageSize;
-            canvas.height = imageSize;
+          const emoji = formattedData.find(
+            (data) =>
+              data.Emoji.includes(baseEmoji) ||
+              data.Hexadecimal.includes(baseEmoji) ||
+              data.Decimal.includes(baseEmoji)
+          );
 
-            context.font = imageSize * 0.8 + 'px CustomFont';
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(
-              characterContainer.textContent,
-              canvas.width / 2,
-              canvas.height / 2
-            );
+          if (!emoji) {
+            console.log('Emoji not found: ', encodedEmoji);
+            return; // Skip this iteration if emoji is undefined
+          }
 
-            var dataUrl = canvas.toDataURL('image/png');
-            var link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = 'image_' + (index + 1) + '.png';
-            link.click();
-          });
+          let fileName;
+
+          if (selectedFormat === 'hexadecimal') {
+            fileName = emoji.Hexadecimal?.replace('&#x', '') + '.png';
+          } else if (selectedFormat === 'decimal') {
+            fileName = emoji.Decimal?.replace('&#', '') + '.png';
+          } else if (selectedFormat === 'name-size-px') {
+            const emojiName = emoji.Name?.replace(/ /g, '-');
+            fileName = `${emojiName}-${imageSize}px.png`;
+          } else if (selectedFormat === 'name') {
+            const emojiName = emoji.Name?.replace(/ /g, '-');
+            fileName = `${emojiName}.png`;
+          }
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+
+          canvas.width = imageSize;
+          canvas.height = imageSize;
+
+          context.font = `${imageSize * 0.8}px CustomFont`;
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          context.fillText(emojiCharacter, canvas.width / 2, canvas.height / 2);
+
+          const dataUrl = canvas.toDataURL('image/png');
+
+          zip.file(fileName, dataUrl.split('base64,')[1], { base64: true });
         });
+
+        zip
+          .generateAsync({ type: 'blob' })
+          .then((content) => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${count}-emojis.zip`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          })
+          .catch((error) => {
+            console.error('Error generating zip file:', error);
+          });
+
+        if (numImages === 1) {
+          downloadButton.textContent = 'Download Image';
+        } else {
+          downloadButton.textContent = `Download ${numImages} Images`;
+        }
+      });
+
+      loadEmojisButton.addEventListener('click', () => {
+        const emojis = formattedData.map((data) => data.Emoji);
+        textInput.value = emojis.join(' ');
+
+        updateCharacterContainer();
+      });
     </script>
+    <script src="./jszip.min.js"></script>
   </body>
 </html>
