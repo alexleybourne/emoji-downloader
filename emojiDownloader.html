@@ -2,6 +2,24 @@
 <html>
   <head>
     <title>Emoji Downloader 💾</title>
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./favicon/site.webmanifest" />
     <style>
       @font-face {
         font-family: 'CustomFont';
@@ -9,9 +27,15 @@
       }
 
       body {
-        background-color: #222;
-        color: #fff;
+        background-color: #1f1f1f;
+        color: #e0e0e0;
         font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: left;
+        justify-content: center;
       }
 
       .button {
@@ -27,12 +51,6 @@
 
       button {
         margin-top: 10px;
-      }
-
-      .container {
-        width: 90%;
-        margin: 0 auto;
-        padding: 20px;
       }
 
       .input-container {
@@ -61,6 +79,13 @@
         font-size: 24px;
         font-weight: bold;
         font-family: 'CustomFont';
+      }
+
+      footer {
+        position: absolute;
+        bottom: 0;
+        text-decoration: none;
+        padding: 20px 10px;
       }
     </style>
   </head>
@@ -124,6 +149,12 @@
       </div>
       <button id="downloadButton" class="button">No Emojis ☹️</button>
     </div>
+    <footer>
+      Created by
+      <a class="button" target="_blank" href="https://twitter.com/AlexLeybourne"
+        >Alex Leybourne 😎</a
+      >
+    </footer>
 
     <script type="module">
       import { formattedData } from './formattedData.js';

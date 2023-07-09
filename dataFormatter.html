@@ -2,6 +2,24 @@
 <html>
   <head>
     <title>Emoji Data Formatter 😎</title>
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./favicon/site.webmanifest" />
     <style>
       body {
         background-color: #1f1f1f;
@@ -88,52 +106,75 @@
     </style>
     <script type="module">
       import { unicodeRawData } from './UnicodeRawData.js';
+      // const inputDataValue = unicodeRawData;
 
-      document.getElementById('inputData').value = unicodeRawData;
+      //       const inputDataValue = `1F636 200D 1F32B FE0F                                  ; fully-qualified     # 😶‍🌫️ E13.1 face in clouds
+      // 1F636 200D 1F32B                                       ; minimally-qualified # 😶‍🌫 E13.1 face in clouds`;
+
+      const inputDataValue = `
+      1F48F 1F3FF                                            ; fully-qualified     # 💏🏿 E13.1 kiss: dark skin tone
+1F9D1 1F3FB 200D 2764 FE0F 200D 1F48B 200D 1F9D1 1F3FC ; fully-qualified     # 🧑🏻‍❤️‍💋‍🧑🏼 E13.1 kiss: person, person, light skin tone, medium-light skin tone
+1F9D1 1F3FB 200D 2764 200D 1F48B 200D 1F9D1 1F3FC      ; minimally-qualified # 🧑🏻‍❤‍💋‍🧑🏼 E13.1 kiss: person, person, light skin tone, medium-light skin tone
+      `;
+
+      document.getElementById('inputData').value = inputDataValue;
 
       const formatData = () => {
         const inputData = document.getElementById('inputData').value;
 
-        // Remove comments from the input data
-        const cleanedData = inputData.replace(/#.*/g, '');
-
         // Split the data into lines
-        const lines = cleanedData.split('\n');
+        const lines = inputData
+          .split(/\r?\n/)
+          .filter((line) => line.trim() !== '');
 
         // Initialize an empty array to store the formatted objects
         const formattedData = [];
 
         // Process each line of the data
         for (const line of lines) {
+          console.log('LINE: ', line);
+
           // Skip empty lines and subgroup lines
-          if (line.trim() === '' || line.startsWith('# subgroup:')) {
+          if (
+            line.trim() === '' ||
+            line.startsWith('# subgroup:') ||
+            line.startsWith('# group:') ||
+            line.includes('subtotal:')
+          ) {
             continue;
           }
+          const lineData = line
+            .replace('qualified ', 'qualified  ')
+            .split('  ');
 
-          // Extract the hexcode and description
-          const [hexcode, , description] = line.split(';');
+          console.log('LINE DATA: ', lineData);
 
-          // Extract the valid hexcode
-          const validHexcode = hexcode.trim().match(/[0-9A-F ]+/i)[0];
+          // remove empty values
+          const filteredLineData = lineData.filter((value) => {
+            return !value.includes('qualified') && value.trim() !== '';
+          });
+          console.log('filteredLineData: ', filteredLineData);
 
-          // Convert hexcode to decimal values
-          const decimalValues = validHexcode
-            .trim()
-            .split(' ')
-            .map((code) => parseInt(code, 16));
+          const Hexcode = filteredLineData[0];
+          const remainingData = filteredLineData[1]
+            .replace('# ', '')
+            .split(' ');
 
-          // Check if decimal values are valid
-          if (decimalValues.some(isNaN)) {
-            console.error(`Invalid hexcode: ${hexcode}`);
-            continue;
-          }
+          // console.log('remainingData: ', remainingData);
+
+          const Emoji = remainingData[0];
+          const Description = remainingData.splice(2).join(' ');
+
+          // console.log('Description: ', Description);
 
           // Create an object with the extracted information
           const emojiObject = {
-            Emoji: String.fromCodePoint(...decimalValues),
-            Hexcode: validHexcode,
-            Description: description.trim(),
+            Emoji,
+            Hexcode,
+            Description,
           };
+
+          console.log('emojiObject: ', emojiObject);
 
           // Add the object to the formatted data array
           formattedData.push(emojiObject);
