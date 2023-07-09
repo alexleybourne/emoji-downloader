@@ -36,6 +36,7 @@
         flex-direction: column;
         align-items: left;
         justify-content: center;
+        margin-bottom: 60px;
       }
 
       .button {
@@ -82,7 +83,7 @@
       }
 
       footer {
-        position: absolute;
+        position: fixed;
         bottom: 0;
         text-decoration: none;
         padding: 20px 10px;
@@ -101,7 +102,7 @@
           type="text"
           id="textInput"
           class="textInput"
-          placeholder="Type something..."
+          placeholder="Type your emojis with a space between each one 😁"
         ></textarea>
         <button id="loadEmojisButton" class="button">Load All Emojis 😎</button>
         <button id="clearButton" class="button">Clear 🚮</button>
@@ -138,14 +139,7 @@
           value="hexadecimal"
           checked
         />
-        <label for="formatHexadecimal">Hexadecimal</label>
-        <input
-          type="radio"
-          id="formatDecimal"
-          name="nameFormat"
-          value="decimal"
-        />
-        <label for="formatDecimal">Decimal</label>
+        <label for="formatHexadecimal">Hexcode</label>
       </div>
       <button id="downloadButton" class="button">No Emojis ☹️</button>
     </div>
@@ -157,7 +151,7 @@
     </footer>
 
     <script type="module">
-      import { formattedData } from './formattedData.js';
+      import { formattedData } from './formattedUnicodeData.js';
 
       const textInput = document.getElementById('textInput');
       const loadEmojisButton = document.getElementById('loadEmojisButton');
@@ -187,7 +181,9 @@
             characterContainer.appendChild(divElement);
           }
         });
+      };
 
+      const buttonText = () => {
         if (count === 0 || undefined) {
           downloadButton.textContent = 'No Emojis ☹️';
         } else if (count === 1) {
@@ -204,9 +200,12 @@
 
       textInput.addEventListener('input', () => {
         updateCharacterContainer();
+        buttonText();
       });
 
       downloadButton.addEventListener('click', () => {
+        downloadButton.textContent = `Generating Emojis Images ✨`;
+
         const characterContainers = document.querySelectorAll(
           '.character-container'
         );
@@ -233,8 +232,8 @@
           const emoji = formattedData.find(
             (data) =>
               data.Emoji.includes(baseEmoji) ||
-              data.Hexadecimal.includes(baseEmoji) ||
-              data.Decimal.includes(baseEmoji)
+              data.Hexcode.includes(baseEmoji) ||
+              data.Description.includes(baseEmoji)
           );
 
           if (!emoji) {
@@ -245,14 +244,12 @@
           let fileName;
 
           if (selectedFormat === 'hexadecimal') {
-            fileName = emoji.Hexadecimal?.replace('&#x', '') + '.png';
-          } else if (selectedFormat === 'decimal') {
-            fileName = emoji.Decimal?.replace('&#', '') + '.png';
+            fileName = emoji.Hexcode?.replace('&#x', '') + '.png';
           } else if (selectedFormat === 'name-size-px') {
-            const emojiName = emoji.Name?.replace(/ /g, '-');
+            const emojiName = emoji.Description?.replace(/ /g, '-');
             fileName = `${emojiName}-${imageSize}px.png`;
           } else if (selectedFormat === 'name') {
-            const emojiName = emoji.Name?.replace(/ /g, '-');
+            const emojiName = emoji.Description?.replace(/ /g, '-');
             fileName = `${emojiName}.png`;
           }
 
@@ -282,16 +279,15 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            downloadButton.textContent = 'Emojis Downloaded 🎉';
+            setTimeout(() => {
+              buttonText();
+            }, 1000);
           })
           .catch((error) => {
             console.error('Error generating zip file:', error);
+            buttonText();
           });
-
-        if (numImages === 1) {
-          downloadButton.textContent = 'Download Image';
-        } else {
-          downloadButton.textContent = `Download ${numImages} Images`;
-        }
       });
 
       loadEmojisButton.addEventListener('click', () => {

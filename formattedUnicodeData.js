@@ -1,4 +1,4 @@
-export const formattedUnicodeData = [
+export const formattedData = [
   {
     Emoji: '😀',
     Hexcode: '1F600',
