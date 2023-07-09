@@ -48,6 +48,10 @@
         border-radius: 4px;
       }
 
+      a {
+        color: white;
+      }
+
       button:hover {
         background-color: #707070;
       }
@@ -82,36 +86,57 @@
         padding: 20px 10px;
       }
     </style>
-    <script>
-      function formatData() {
+    <script type="module">
+      import { unicodeRawData } from './UnicodeRawData.js';
+
+      document.getElementById('inputData').value = unicodeRawData;
+
+      const formatData = () => {
         const inputData = document.getElementById('inputData').value;
 
+        // Remove comments from the input data
+        const cleanedData = inputData.replace(/#.*/g, '');
+
         // Split the data into lines
-        const lines = inputData.split('\n');
+        const lines = cleanedData.split('\n');
 
         // Initialize an empty array to store the formatted objects
         const formattedData = [];
 
-        // Regular expressions to extract emoji, name, hexadecimal, and decimal values
-        const regex = /(.+)\t(.+)\t(.+)\t(.+)/;
-
         // Process each line of the data
         for (const line of lines) {
-          // Extract the relevant information using regular expressions
-          const match = line.match(regex);
-
-          if (match) {
-            // Create an object with the extracted information
-            const emojiObject = {
-              Emoji: match[1],
-              Name: match[2],
-              Hexadecimal: match[3],
-              Decimal: match[4],
-            };
-
-            // Add the object to the formatted data array
-            formattedData.push(emojiObject);
+          // Skip empty lines and subgroup lines
+          if (line.trim() === '' || line.startsWith('# subgroup:')) {
+            continue;
           }
+
+          // Extract the hexcode and description
+          const [hexcode, , description] = line.split(';');
+
+          // Extract the valid hexcode
+          const validHexcode = hexcode.trim().match(/[0-9A-F ]+/i)[0];
+
+          // Convert hexcode to decimal values
+          const decimalValues = validHexcode
+            .trim()
+            .split(' ')
+            .map((code) => parseInt(code, 16));
+
+          // Check if decimal values are valid
+          if (decimalValues.some(isNaN)) {
+            console.error(`Invalid hexcode: ${hexcode}`);
+            continue;
+          }
+
+          // Create an object with the extracted information
+          const emojiObject = {
+            Emoji: String.fromCodePoint(...decimalValues),
+            Hexcode: validHexcode,
+            Description: description.trim(),
+          };
+
+          // Add the object to the formatted data array
+          formattedData.push(emojiObject);
         }
 
         // Convert the formatted data to a JSON string
@@ -119,29 +144,44 @@
 
         // Update the output box with the formatted data
         document.getElementById('outputData').value = outputData;
-      }
+      };
 
       function copyToClipboard() {
         const outputData = document.getElementById('outputData');
         outputData.select();
         document.execCommand('copy');
       }
+
+      document
+        .getElementById('formatButton')
+        .addEventListener('click', formatData);
+
+      document
+        .getElementById('copyButton')
+        .addEventListener('click', copyToClipboard);
     </script>
   </head>
   <body>
     <h1>
-      <a title="home" class="button" href="./index.html">⬅️</a> Data Formatter
-      😎
+      <a title="home" class="button" href="./index.html">⬅️</a>
+      Data Formatter 😎
     </h1>
+    <p>
+      Data:
+      <a
+        href="https://unicode.org/Public/emoji/15.0/emoji-test.txt"
+        target="_blank"
+      >
+        Unicode emoji 15 😎
+      </a>
+    </p>
     <textarea id="inputData" placeholder="Enter the data here"></textarea>
     <br />
-    <button onclick="formatData()">Format Data ✨</button>
+    <button id="formatButton">Format Data ✨</button>
     <br />
     <div class="output-container">
       <textarea id="outputData" readonly></textarea>
-      <button class="copy-button" onclick="copyToClipboard()">
-        Copy to Clipboard 📋
-      </button>
+      <button id="copyButton" class="copy-button">Copy to Clipboard 📋</button>
     </div>
     <footer>
       Created by

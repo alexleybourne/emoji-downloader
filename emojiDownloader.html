@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Emoji Viewer</title>
+    <title>Emoji Downloader 💾</title>
     <style>
       @font-face {
         font-family: 'CustomFont';
@@ -14,8 +14,23 @@
         font-family: Arial, sans-serif;
       }
 
+      .button {
+        background-color: #4f4f4f;
+        color: #e0e0e0;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-right: 10px;
+      }
+
+      button {
+        margin-top: 10px;
+      }
+
       .container {
-        max-width: 600px;
+        width: 90%;
         margin: 0 auto;
         padding: 20px;
       }
@@ -34,6 +49,11 @@
         outline: none;
       }
 
+      .textInput {
+        width: 100%;
+        min-height: 100px;
+      }
+
       .character-container {
         display: inline-block;
         margin-right: 5px;
@@ -46,16 +66,20 @@
   </head>
   <body>
     <div class="container">
-      <h1>Emoji Viewer</h1>
+      <h1>
+        <a title="home" class="button" href="./index.html">⬅️</a>Emoji
+        Downloader 💾
+      </h1>
 
       <div class="input-container">
         <textarea
           type="text"
           id="textInput"
+          class="textInput"
           placeholder="Type something..."
         ></textarea>
-        <button id="loadEmojisButton">Load All Emojis</button>
-        <button id="clearButton">Clear</button>
+        <button id="loadEmojisButton" class="button">Load All Emojis 😎</button>
+        <button id="clearButton" class="button">Clear 🚮</button>
       </div>
 
       <div id="characterContainer"></div>
@@ -98,8 +122,7 @@
         />
         <label for="formatDecimal">Decimal</label>
       </div>
-
-      <button id="downloadButton">No Emojis</button>
+      <button id="downloadButton" class="button">No Emojis ☹️</button>
     </div>
 
     <script type="module">
@@ -135,11 +158,11 @@
         });
 
         if (count === 0 || undefined) {
-          downloadButton.textContent = 'No Emojis';
+          downloadButton.textContent = 'No Emojis ☹️';
         } else if (count === 1) {
-          downloadButton.textContent = 'Download Image';
+          downloadButton.textContent = 'Download Image 🌠';
         } else {
-          downloadButton.textContent = `Download ${count} Images`;
+          downloadButton.textContent = `Download ${count} Images 🌠`;
         }
       };
 
